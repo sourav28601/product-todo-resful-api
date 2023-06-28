@@ -13,27 +13,46 @@ class ProductController {
   }
   };
 
-static createProduct = async (req, res) => {
-    // console.log(req.body);
-    try {
-          const data = await productModel.create(req.body);
-          // console.log(data);
-          res.status(201).json({success: true,data})
 
-      } catch (err) {
-          console.log(err);
-      }
-  };
-  
-  static updateProduct = async (req, res) => {
-    try {
-        const data = await productModel.findByIdAndUpdate(req.params.id, req.body);
-        res.status(201).json({success: true,message: "product updated successfully",data})
-    } catch (err) {
-        console.log(err);
+   //insert
+   static createProduct = async(req,res)=>{
+    try{
+        const{name,price,quantity,image}=req.body
+        const data = new productModel({
+            name:name,
+            price:price,
+            quantity:quantity,
+            image:req.file.filename
+        })
+        await data.save()
+        res.status(201).json({success: true,data})
+    }catch(err){
+        console.log(err)
     }
-
 };
+
+static updateProduct = async(req,res) =>{
+    // console.log(req.params.id)
+    // console.log(req.body)
+    try{
+        if(req.file){
+            var imagefile = req.file.filename
+        }
+        const data = await productModel.findByIdAndUpdate(req.params.id,{
+            name:req.body.name,
+            price:req.body.price,
+            quantity:req.body.quantity,
+            image:imagefile
+        })
+        // console.log(data)
+        res.status(201).json({success: true,message: "product updated successfully",data})
+    }catch(err) 
+    {
+     console.log(err)
+    }
+};
+
+
 static deleteProduct = async (req, res) => {
   try {
       const product = await productModel.findByIdAndDelete(req.params.id)
